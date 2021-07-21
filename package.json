@@ -1,0 +1,35 @@
+{
+    "name": "jsondatabase.js",
+    "version": "0.0.1-alpha",
+    "description": "jsondatabase.js is a nodejs module to create a simple JSON oriented database in your projects",
+    "main": "./src/index.js",
+    "scripts": {
+        "test": "jest"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/VironLab/jsondatabase.js.git"
+    },
+    "keywords": [
+        "database",
+        "json",
+        "json-database",
+        "datasaving"
+    ],
+    "author": "VironLab",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/VironLab/jsondatabase.js/issues"
+    },
+    "homepage": "https://github.com/VironLab/jsondatabase.js#readme",
+    "dependencies": {
+        "events": "^3.3.0",
+        "fs": "^0.0.1-security",
+        "md5": "^2.3.0",
+        "path": "^0.12.7",
+        "uuid": "^8.3.2"
+    },
+    "devDependencies": {
+        "jest": "^27.0.6"
+    }
+}
