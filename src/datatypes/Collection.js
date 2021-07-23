@@ -43,6 +43,7 @@ const { EventEmitter } = require('events');
 const { DatabaseActionError } = require('../errors');
 const DocumentCollection = require('./DocumentCollection');
 const Document = require('./Document');
+const JsonDatabase = require('../JsonDatabase');
 
 class Collection {
     constructor(collectionPath, database) {
@@ -101,6 +102,9 @@ class Collection {
         this.events.emit('ready');
     }
 
+    /**
+     * Reload Documents from file
+     */
     refresh() {
         var collectionFileData = JSON.parse(fs.readFileSync(this.collectionPath));
         var collectionData = collectionFileData.collection_data;
@@ -113,6 +117,9 @@ class Collection {
         return this;
     }
 
+    /**
+     * Save Documents to Collection file
+     */
     save(ignore_last = false) {
         if (new Date().getTime() - this.lastSave > 1000 || ignore_last) {
             var data = [];
@@ -127,6 +134,11 @@ class Collection {
         }
     }
 
+    /**
+     * Query documents by a query object pass an empty object for all documents
+     * @param { Object } query
+     * @returns { DocumentCollection } result
+     */
     query(query = {}) {
         if (query == {}) return this.documents;
         let result = new DocumentCollection(this, []);
@@ -142,16 +154,44 @@ class Collection {
         return result;
     }
 
+    /**
+     * Query the first of the documents by a query object pass an empty object for all documents
+     * @param { Object } query
+     * @returns { DocumentCollection } result
+     */
     findOne(query = {}) {
         return new DocumentCollection(this, [this.query(query)[0]]);
     }
 
+    /**
+     * Query documents by key and given expected value
+     * @param { String } key
+     * @param { String } expectedValue
+     * @returns { DocumentCollection } result
+     */
     search(key, expectedValue) {
         var query = {};
         query[key] = expectedValue;
         return this.query(query);
     }
 
+    /**
+     * Query the first of documents by key and given expected value
+     * @param { String } key
+     * @param { String } expectedValue
+     * @returns { DocumentCollection } result
+     */
+    searchOne(key, expectedValue) {
+        var query = {};
+        query[key] = expectedValue;
+        return this.findOne(query);
+    }
+
+    /**
+     * search all documents wich contain the given keys
+     * @param { Array<String> || String } keys
+     * @returns { DocumentCollection } result
+     */
     byContainingKeys(...keys) {
         let result = new DocumentCollection(this, []);
         this.documents.forEach((document) => {
@@ -166,6 +206,22 @@ class Collection {
         return result;
     }
 
+    /**
+     * search first document wich contain the given keys
+     * @param { Array<String> || String } keys
+     * @returns { DocumentCollection } result
+     */
+    byContainingKeysOne(...keys) {
+        let result = new DocumentCollection(this, []);
+        result.push(this.byContainingKeys(keys)[0]);
+        return result;
+    }
+
+    /**
+     * Insert a Document to a collection
+     * @param { Document | Object } document
+     * @returns { Document } document wich was inserted
+     */
     insertDocument(document) {
         if (!(document instanceof Document)) {
             document = new Document(document);
@@ -178,6 +234,11 @@ class Collection {
         return null;
     }
 
+    /**
+     * Insert a Document to a collection
+     * @param { Array<Document | Object> } documents
+     * @returns { DocumentCollection } documentCollection of inserted Documents
+     */
     insertManyDocuments(...documents) {
         var inserted = [];
         documents.forEach((document) => {
@@ -186,6 +247,11 @@ class Collection {
         return new DocumentCollection(this, inserted);
     }
 
+    /**
+     * Delete the first found document by a giben query object
+     * @param { Object } query
+     * @returns { Boolean } success
+     */
     deleteOneDocument(query = {}) {
         let result = this.query(query);
         if (!result[0]) return false;
@@ -198,6 +264,11 @@ class Collection {
         return true;
     }
 
+    /**
+     * Delete all found documents by a giben query object
+     * @param { Object } query
+     * @returns { Boolean } success
+     */
     deleteManyDocuments(query = {}) {
         if (query == {}) {
             this.documents = new DocumentCollection(this, []);
@@ -212,6 +283,11 @@ class Collection {
         return true;
     }
 
+    /**
+     * Update the first found document by a giben query object
+     * @param { Object } query
+     * @returns { Boolean } success
+     */
     updateOneDocument(query = {}, update = {}) {
         let result = this.query(query);
         if (!result[0]) return false;
@@ -225,6 +301,11 @@ class Collection {
         return true;
     }
 
+    /**
+     * Update all found documents by a giben query object
+     * @param { Object } query
+     * @returns { Boolean } success
+     */
     updateManyDocuments(query = {}, update = {}) {
         let result = this.query(query);
         if (!result[0]) return false;
@@ -234,18 +315,33 @@ class Collection {
         return true;
     }
 
+    /**
+     * Get the database instance
+     * @returns { JsonDatabase } databaseInstance
+     */
     getDatabase() {
         return this.database;
     }
 
+    /**
+     * Get ALL Documents inserted into the collection
+     * @returns { DocumentCollection } documents
+     */
     getDocuments() {
         return this.documents;
     }
 
+    /**
+     * Get the length of all inserted Documents
+     * @returns { Number } documents.length
+     */
     length() {
         return this.documents.length;
     }
 
+    /**
+     * Closes all Filewatchers in the collection and daves all unsaved changes
+     */
     close() {
         if (this.unsaved > 0) this.save(true);
         this.fileWatcher.close();

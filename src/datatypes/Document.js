@@ -48,6 +48,14 @@ class Document {
             if (isArray(data) || typeof data === 'boolean' || typeof data === 'string' || typeof data === 'number' || data instanceof String) data = { value: data };
         }
 
+        data = JSON.parse(JSON.stringify(data), (key, value) => {
+            if (typeof value === 'string' && value.startsWith('/Function(') && value.endsWith(')/')) {
+                value = value.substring(10, value.length - 2);
+                return (0, eval)('(' + value + ')');
+            }
+            return value;
+        });
+
         if (!data._id) data._id = uuidv4();
         this._id = data._id;
         this.data = data;
