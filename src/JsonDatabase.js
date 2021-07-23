@@ -97,6 +97,9 @@ class JsonDatabase {
         return collection;
     }
 
+    /**
+     * Closing Database connections and FileWatchers for Collections
+     */
     close() {
         this.events.emit('end');
     }

@@ -142,12 +142,28 @@ class Collection {
         return result;
     }
 
-    find(query = {}) {
+    findOne(query = {}) {
+        return new DocumentCollection(this, [this.query(query)[0]]);
+    }
+
+    search(key, expectedValue) {
+        var query = {};
+        query[key] = expectedValue;
         return this.query(query);
     }
 
-    findOne(query = {}) {
-        return new DocumentCollection(this, [this.query(query)[0]]);
+    byContainingKeys(...keys) {
+        let result = new DocumentCollection(this, []);
+        this.documents.forEach((document) => {
+            var keyMatches = [];
+            var data = document.get();
+            keys.forEach((key) => {
+                if (data[key] != null) keyMatches.push(true);
+                else keyMatches.push(false);
+            });
+            if (!keyMatches.includes(false)) result.push(document);
+        });
+        return result;
     }
 
     insertDocument(document) {
@@ -170,12 +186,64 @@ class Collection {
         return new DocumentCollection(this, inserted);
     }
 
+    deleteOneDocument(query = {}) {
+        let result = this.query(query);
+        if (!result[0]) return false;
+        var newDocumentArray = this.documents.array().filter((value, index, array) => {
+            return JSON.stringify(value) != JSON.stringify(result[0]);
+        });
+        this.documents = new DocumentCollection(this, []);
+        newDocumentArray.forEach((document) => this.documents.push(document));
+        this.save();
+        return true;
+    }
+
+    deleteManyDocuments(query = {}) {
+        if (query == {}) {
+            this.documents = new DocumentCollection(this, []);
+            this.save();
+            return true;
+        }
+        let result = this.query(query);
+        if (!result[0]) return false;
+        result.forEach((document) => {
+            this.deleteOneDocument({ _id: document['_id'] });
+        });
+        return true;
+    }
+
+    updateOneDocument(query = {}, update = {}) {
+        let result = this.query(query);
+        if (!result[0]) return false;
+        var toUpdateDocumentData = result[0].get();
+        Object.keys(update).forEach((key) => {
+            if (key != '_id') toUpdateDocumentData[key] = update[key];
+        });
+        this.deleteOneDocument({ _id: toUpdateDocumentData['_id'] });
+        this.documents.push(Document.from(toUpdateDocumentData));
+        this.save();
+        return true;
+    }
+
+    updateManyDocuments(query = {}, update = {}) {
+        let result = this.query(query);
+        if (!result[0]) return false;
+        result.forEach((document) => {
+            this.updateOneDocument({ _id: document['_id'] }, update);
+        });
+        return true;
+    }
+
     getDatabase() {
         return this.database;
     }
 
     getDocuments() {
         return this.documents;
+    }
+
+    length() {
+        return this.documents.length;
     }
 
     close() {
