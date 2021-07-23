@@ -38,14 +38,25 @@
 
 const jsondatabase = require('../src');
 var db = new jsondatabase.JsonDatabase('./jsondbtest');
-var collection = db.getCollection('users');
 
-collection.insertDocument(jsondatabase.Document.from({ name: 'username1' }));
-collection.insertDocument(jsondatabase.Document.from({ name: 'username2' }));
+db.getCollection('users').insertDocument(jsondatabase.Document.from({ name: 'username1' }));
+db.getCollection('users').insertDocument(jsondatabase.Document.from({ name: 'username2' }));
 
-console.log(collection.deleteOneDocument({ name: 'username1' }));
-console.log(collection.updateManyDocuments({}, { collection_length: collection.length() }));
+console.log(db.getCollection('users').deleteOneDocument({ name: 'username1' }));
+console.log(db.getCollection('users').updateManyDocuments({}, { collection_length: db.getCollection('users').length() }));
 
-if (collection.length() >= 10) console.log(collection.deleteManyDocuments({}));
+var doc = db.getCollection('users').insertDocument(
+    jsondatabase.Document.from({
+        name: 'functionTest',
+        func: () => {
+            console.log('Funny Function XD');
+        },
+    }),
+);
+
+var docWithFunction = db.getCollection('users').findOne({ name: 'functionTest' });
+docWithFunction.data.func();
+
+if (db.getCollection('users').length() >= 10) console.log(db.getCollection('users').deleteManyDocuments({}));
 
 db.close();
