@@ -15,6 +15,37 @@ jsondatabase.js is a nodejs module to create a simple JSON oriented database in 
 
 ---
 
+## Current functionality ( testing.js )
+
+```js
+const jsondatabase = require('jsondatabase.js');
+var db = new jsondatabase.JsonDatabase('./jsondbtest');
+
+db.getCollection('users').insertDocument(jsondatabase.Document.from({ name: 'username1' }));
+db.getCollection('users').insertDocument(jsondatabase.Document.from({ name: 'username2' }));
+
+console.log(db.getCollection('users').deleteOneDocument({ name: 'username1' }));
+console.log(db.getCollection('users').updateManyDocuments({}, { collection_length: db.getCollection('users').length() }));
+
+var doc = db.getCollection('users').insertDocument(
+    jsondatabase.Document.from({
+        name: 'functionTest',
+        func: () => {
+            console.log('Funny Function XD');
+        },
+    }),
+);
+
+var docWithFunction = db.getCollection('users').findOne({ name: 'functionTest' });
+docWithFunction.data.func();
+
+if (db.getCollection('users').length() >= 10) console.log(db.getCollection('users').deleteManyDocuments({}));
+
+db.close();
+```
+
+---
+
 ### Discord
 
 <div align="center">
