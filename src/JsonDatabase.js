@@ -83,6 +83,7 @@ class JsonDatabase {
     /**
      * Get a Collection in the Database | If it does not exist it will be created
      * @param { String } collectionName
+     * @returns { Collection }
      */
     getCollection(collectionName = 'collection-1.json') {
         //? collection name ends with .json ? if not add it
