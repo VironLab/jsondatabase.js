@@ -47,30 +47,152 @@ class DocumentCollection extends Array {
         this.len = this.length;
     }
 
+    /**
+     * Query documents by a query object pass an empty object for all documents
+     * @param { Object } query
+     * @returns { DocumentCollection } result
+     */
+    query(query) {
+        return this.collection.query(query);
+    }
+
+    /**
+     * Query the first of the documents by a query object pass an empty object for all documents
+     * @param { Object } query
+     * @returns { DocumentCollection } result
+     */
+    findOne(query) {
+        return this.collection.findOne(query);
+    }
+
+    /**
+     * Query documents by key and given expected value
+     * @param { String } key
+     * @param { String } expectedValue
+     * @returns { DocumentCollection } result
+     */
+    search(key, expectedValue) {
+        return this.collection.search(key, expectedValue);
+    }
+
+    /**
+     * Query the first of documents by key and given expected value
+     * @param { String } key
+     * @param { String } expectedValue
+     * @returns { DocumentCollection } result
+     */
+    searchOne(key, expectedValue) {
+        return this.collection.searchOne(key, expectedValue);
+    }
+
+    /**
+     * search all documents wich contain the given keys
+     * @param { Array<String> || String } keys
+     * @returns { DocumentCollection } result
+     */
+    byContainingKeys(...keys) {
+        return this.collection.byContainingKeys(keys);
+    }
+
+    /**
+     * search first document wich contain the given keys
+     * @param { Array<String> || String } keys
+     * @returns { DocumentCollection } result
+     */
+    byContainingKeysOne(...keys) {
+        return this.collection.byContainingKeysOne(keys);
+    }
+
+    /**
+     * Insert a Document to a collection
+     * @param { Document | Object } document
+     * @returns { Document } document wich was inserted
+     */
+    insertDocument(document) {
+        return this.collection.insertDocument(document);
+    }
+
+    /**
+     * Insert a Document to a collection
+     * @param { Array<Document | Object> } documents
+     * @returns { DocumentCollection } documentCollection of inserted Documents
+     */
+    insertManyDocuments(...documents) {
+        return this.collection.insertManyDocuments(documents);
+    }
+
+    /**
+     * Delete the first found document by a giben query object
+     * @param { Object } query
+     * @returns { Boolean } success
+     */
+    deleteOneDocument(query) {
+        return this.collection.deleteOneDocument(query);
+    }
+
+    /**
+     * Delete all found documents by a giben query object
+     * @param { Object } query
+     * @returns { Boolean } success
+     */
+    deleteManyDocuments(query) {
+        return this.collection.deleteManyDocuments(query);
+    }
+
+    /**
+     * Update the first found document by a giben query object
+     * @param { Object } query
+     * @returns { Boolean } success
+     */
+    updateOneDocument(query, update) {
+        return this.collection.updateOneDocument(query, update);
+    }
+
+    /**
+     * Update all found documents by a giben query object
+     * @param { Object } query
+     * @returns { Boolean } success
+     */
+    updateManyDocuments(query, update) {
+        return this.collection.updateManyDocuments(query, update);
+    }
+
+    /**
+     * Get the database instance
+     * @returns { JsonDatabase } databaseInstance
+     */
+    getDatabase() {
+        return this.collection.getDatabase();
+    }
+
+    /**
+     * Get the collection instance
+     * @returns { Collection } collectionInstance
+     */
     getCollection() {
         return this.collection;
     }
 
-    insertDocument(document) {
-        return this.collection.insertDocument(document).documents;
+    /**
+     * Get the length of all inserted Documents
+     * @returns { Number } documents.length
+     */
+    length() {
+        return this.length;
     }
 
-    query(query = {}) {
-        return this.collection.query(query);
-    }
-
-    find(query = {}) {
-        return this.collection.find(query);
-    }
-
-    findOne(query = {}) {
-        return this.collection.findOne(query);
-    }
-
+    /**
+     * Get a document by given index
+     * @returns { Document } document
+     */
     get(index) {
-        return this[index];
+        return this[index] || null;
     }
 
+    /**
+     * Get ALL Documents inserted into the DocumentCollection as Array
+     * @returns { Array<Document> } documents
+     */
     array() {
         return new Array(...this);
     }

@@ -126,7 +126,7 @@ class Collection {
             this.documents.forEach((document) => {
                 data.push(JSON.parse(document.toJson()));
             });
-            fs.writeFileSync(this.collectionPath, JSON.stringify({ _id: this._id, collection_data: data }, null, 4));
+            fs.writeFileSync(this.collectionPath, JSON.stringify({ _id: this._id, collection_data: data }, null, 2));
             this.lastSave = new Date().getTime();
             this.unsaved = 0;
         } else {
@@ -160,7 +160,7 @@ class Collection {
      * @returns { DocumentCollection } result
      */
     findOne(query = {}) {
-        return new DocumentCollection(this, [this.query(query)[0]]);
+        return this.query(query)[0];
     }
 
     /**

@@ -44,23 +44,42 @@ var isFunction = (toCheckVar) => toCheckVar !== null && typeof toCheckVar === 'f
 
 class Document {
     constructor(data) {
+        //! Convert any data to Object
         if (!isPlainObject(data)) {
             if (isArray(data) || typeof data === 'boolean' || typeof data === 'string' || typeof data === 'number' || data instanceof String) data = { value: data };
         }
 
-        data = JSON.parse(JSON.stringify(data), (key, value) => {
-            if (typeof value === 'string' && value.startsWith('/Function(') && value.endsWith(')/')) {
-                value = value.substring(10, value.length - 2);
-                return (0, eval)('(' + value + ')');
-            }
-            return value;
-        });
+        if (isFunction(data)) {
+            data = { savedFunction: data };
+        }
 
-        if (!data._id) data._id = uuidv4();
-        this._id = data._id;
-        this.data = data;
+        //? Convert functions
+        var dataParsed = JSON.parse(
+            JSON.stringify(data, function (key, value) {
+                if (typeof value === 'function') {
+                    return '/Function(' + value.toString() + ')/';
+                }
+                return value;
+            }),
+            (key, value) => {
+                if (typeof value === 'string' && value.startsWith('/Function(') && value.endsWith(')/')) {
+                    value = value.substring(10, value.length - 2);
+                    return (0, eval)('(' + value + ')');
+                }
+                return value;
+            },
+        );
+
+        if (!dataParsed._id) dataParsed._id = uuidv4();
+        this._id = dataParsed._id;
+        this.data = dataParsed;
     }
 
+    /**
+     * Get data of document optional value by a given key
+     * @param { String } key
+     * @returns { Object | any } value/data
+     */
     get(key) {
         return key != null ? this.data[key] || null : this.data;
     }
@@ -74,9 +93,10 @@ class Document {
     }
 
     getFunction(key, defaultValue = () => {}) {
-        return key != null ? this.data[key] || defaultValue : this.data['func'] || defaultValue;
+        return key != null ? this.data[key] || defaultValue : this.data['savedFunction'] || defaultValue;
     }
 
+    /** Convert the data to JSON string */
     toJson() {
         return JSON.stringify(
             this.data,
@@ -87,12 +107,16 @@ class Document {
                 return value;
             },
             null,
-            4,
+            2,
         );
     }
 
+    /**
+     * Create an instance of this Document
+     * @param { Object | Function | String | Array | Number } data
+     * @returns { Document } documentInstance
+     */
     static from(data) {
-        if (!data._id) data._id = uuidv4();
         return new Document(data);
     }
 }
