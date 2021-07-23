@@ -57,7 +57,7 @@ class Document {
         var dataParsed = JSON.parse(
             JSON.stringify(data, function (key, value) {
                 if (typeof value === 'function') {
-                    return '/Function(' + value.toString() + ')/';
+                    return '/Function(' + value.toString().trim().split(/ +/g).join(' ') + ')/';
                 }
                 return value;
             }),
@@ -102,7 +102,7 @@ class Document {
             this.data,
             function (key, value) {
                 if (typeof value === 'function') {
-                    return '/Function(' + value.toString() + ')/';
+                    return '/Function(' + value.toString().trim().split(/ +/g).join(' ') + ')/';
                 }
                 return value;
             },
