@@ -84,14 +84,29 @@ class Document {
         return key != null ? this.data[key] || null : this.data;
     }
 
+    /**
+     * Get data as string of document optional value by a given key
+     * @param { String } key
+     * @returns { String } value
+     */
     getString(key, defaultValue = '') {
         return key != null ? '' + this.data[key] || defaultValue : '' + this.data['value'] || defaultValue;
     }
 
+    /**
+     * Get data as Number of document optional value by a given key
+     * @param { String } key
+     * @returns { Number } value
+     */
     getInt(key, defaultValue = -1) {
         return key != null ? 0 + parseInt(this.data[key]) || defaultValue : 0 + parseInt(this.data['value']) || defaultValue;
     }
 
+    /**
+     * Get data as Function of document optional value by a given key
+     * @param { String } key
+     * @returns { Function } value
+     */
     getFunction(key, defaultValue = () => {}) {
         return key != null ? this.data[key] || defaultValue : this.data['savedFunction'] || defaultValue;
     }

@@ -157,7 +157,7 @@ class Collection {
     /**
      * Query the first of the documents by a query object pass an empty object for all documents
      * @param { Object } query
-     * @returns { DocumentCollection } result
+     * @returns { Document } result
      */
     findOne(query = {}) {
         return this.query(query)[0];
@@ -209,12 +209,10 @@ class Collection {
     /**
      * search first document wich contain the given keys
      * @param { Array<String> || String } keys
-     * @returns { DocumentCollection } result
+     * @returns { Document } result
      */
     byContainingKeysOne(...keys) {
-        let result = new DocumentCollection(this, []);
-        result.push(this.byContainingKeys(keys)[0]);
-        return result;
+        return this.byContainingKeys(keys)[0];
     }
 
     /**
